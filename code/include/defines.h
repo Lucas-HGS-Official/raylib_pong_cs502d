@@ -7,9 +7,20 @@
 #define PADDLE_SPEED 250
 
 enum FontSizes {
-    SCORE_FONT = 64,
-    LARGE_FONT = 32,
     SMALL_FONT = 16,
+    LARGE_FONT = 32,
+    SCORE_FONT = 64,
 };
 
+enum GameStates {
+    START,
+};
+
+extern enum GameStates game_state;
+
 extern Font pixeledted_font;
+
+extern int serving_player;
+
+extern int player_1_score;
+extern int player_2_score;
