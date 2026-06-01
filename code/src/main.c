@@ -76,7 +76,7 @@ int game_update(void) {
 
 int game_draw(void) {
     BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground((Color) {40, 60, 60, 255});
 
         display_score();
 
@@ -102,11 +102,11 @@ int display_score(void) {
     // TODO: Think of a better way to position the scores
 
 
-    DrawTextEx(pixeledted_font, TextFormat("%d", player_1_score), player_1_score_pos, SCORE_FONT, 0.F, BLACK);
+    DrawTextEx(pixeledted_font, TextFormat("%d", player_1_score), player_1_score_pos, SCORE_FONT, 0.F, WHITE);
 
     DrawLine(WINDOW_WIDTH / 2.f, 0, WINDOW_WIDTH / 2.f, WINDOW_HEIGHT, BLACK);
 
-    DrawTextEx(pixeledted_font, TextFormat("%d", player_2_score), player_2_score_pos, SCORE_FONT, 0.F, BLACK);
+    DrawTextEx(pixeledted_font, TextFormat("%d", player_2_score), player_2_score_pos, SCORE_FONT, 0.F, WHITE);
 
     return 0;
 }
