@@ -1,22 +1,23 @@
 #include <raylib.h>
+#include <stdio.h>
+
+#include "defines.h"
 
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 450
-#define WINDOW_NAME "Ray Pong!"
-
-#define PADDLE_SPEED 250
+Font pixeledted_font;
 
 int game_init(void);
-int game_update(void);
+int game_mainloop(void);
 int game_close(void);
+
 int game_draw(void);
+int game_update(void);
 
 
 int main(void) {
 
     game_init();
-    game_update();
+    game_mainloop();
     game_close();
 
     return 0;
@@ -26,18 +27,18 @@ int main(void) {
 int game_init(void) {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME);
 
+    pixeledted_font = LoadFont("resources/fonts/font.ttf");
+
+    // TODO: Load all the sounds in a list
+
     SetTargetFPS(60);
 
     return 0;
 }
 
-int game_update(void) {
+int game_mainloop(void) {
     while (!WindowShouldClose()) {
-        // Update
-        //----------------------------------------------------------------------------------
-
-        //----------------------------------------------------------------------------------
-
+        game_update();
         game_draw();
     }
 
@@ -51,12 +52,17 @@ int game_close(void) {
 }
 
 
+int game_update(void) {
+
+    return 0;
+}
+
 int game_draw(void) {
     BeginDrawing();
 
         ClearBackground(RAYWHITE);
 
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+        DrawTextEx(pixeledted_font,"Congrats! You created your first window!", (Vector2) {190, 200}, SCORE_FONT,1, LIGHTGRAY);
 
     EndDrawing();
 
