@@ -1,3 +1,5 @@
+ray_pong_clone
+
 bin/game
 code/obj/*.o
 code/libs/obj/*.o
