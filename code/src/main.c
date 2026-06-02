@@ -21,6 +21,7 @@ int game_draw(void);
 int game_update(void);
 
 int display_score(void);
+int top_text_pair(const char* upper_text, const char* lower_text, int text_size);
 
 
 int main(void) {
@@ -82,33 +83,13 @@ int game_draw(void) {
         break;
 
         case START_STATE: {
-            const int text_padding_up = 10;
-
-            const char* welcome_text = "Welcome to Pong!";
-            Vector2 size_welcome_text = MeasureTextEx(pixeledted_font, welcome_text, SMALL_FONT, 0.f);
-            Vector2 pos_welcome_text = { .x = (WINDOW_WIDTH/2.f) - (size_welcome_text.x/2.f), .y = text_padding_up };
-            DrawTextEx(pixeledted_font, welcome_text, pos_welcome_text, SMALL_FONT, 0.f, WHITE);
-
-            const char* press_enter_text = "Press Enter to begin!";
-            Vector2 size_press_enter_text = MeasureTextEx(pixeledted_font, press_enter_text, SMALL_FONT, 0.f);
-            Vector2 pos_press_enter_text = { .x = (WINDOW_WIDTH/2.f) - (size_press_enter_text.x/2.f), .y = text_padding_up + size_welcome_text.y };
-            DrawTextEx(pixeledted_font, press_enter_text, pos_press_enter_text, SMALL_FONT, 0.f, WHITE);
+            top_text_pair("Welcome to Pong!", "Press Enter to begin!", SMALL_FONT);
 
             break;
         }
 
         case SERVE_STATE: {
-            const int text_padding_up = 10;
-
-            const char* serving_player_text = TextFormat("Player %d's serve", serving_player);
-            Vector2 size_serving_player_text = MeasureTextEx(pixeledted_font, serving_player_text, SMALL_FONT, 0.f);
-            Vector2 pos_serving_player_text = { .x = (WINDOW_WIDTH/2.f) - (size_serving_player_text.x/2.f), .y = text_padding_up };
-            DrawTextEx(pixeledted_font, serving_player_text, pos_serving_player_text, SMALL_FONT, 0.f, WHITE);
-
-            const char* press_enter_text = "Press Enter to serve!";
-            Vector2 size_press_enter_text = MeasureTextEx(pixeledted_font, press_enter_text, SMALL_FONT, 0.f);
-            Vector2 pos_press_enter_text = { .x = (WINDOW_WIDTH/2.f) - (size_press_enter_text.x/2.f), .y = text_padding_up + size_serving_player_text.y };
-            DrawTextEx(pixeledted_font, press_enter_text, pos_press_enter_text, SMALL_FONT, 0.f, WHITE);
+            top_text_pair(TextFormat("Player %d's serve", serving_player), "Press Enter to serve!", SMALL_FONT);
 
             break;
         }
@@ -154,4 +135,16 @@ int display_score(void) {
     return 0;
 }
 
-// 112 lines
+int top_text_pair(const char* upper_text, const  char* lower_text, int text_size) {
+    const int text_padding_up = 10;
+
+    Vector2 size_upper_text = MeasureTextEx(pixeledted_font, upper_text, text_size, 0.f);
+    Vector2 pos_upper_text = { .x = (WINDOW_WIDTH/2.f) - (size_upper_text.x/2.f), .y = text_padding_up };
+    DrawTextEx(pixeledted_font, upper_text, pos_upper_text, text_size, 0.f, WHITE);
+
+    Vector2 size_lower_text = MeasureTextEx(pixeledted_font, lower_text, text_size, 0.f);
+    Vector2 pos_lower_text = { .x = (WINDOW_WIDTH/2.f) - (size_lower_text.x/2.f), .y = text_padding_up + size_upper_text.y };
+    DrawTextEx(pixeledted_font, lower_text, pos_lower_text, text_size, 0.f, WHITE);
+
+    return 0;
+}
