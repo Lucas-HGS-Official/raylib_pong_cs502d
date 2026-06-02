@@ -22,7 +22,7 @@ from_scratch: clean build
 ###################################
 # Build Game
 ###################################
-build: $(TARGET)
+build: clean $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(CC) -o $@ $? -std=c99 -Wall -Wextra -lraylib -lGL -lm -lpthread -ldl -lrt -lX11

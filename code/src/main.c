@@ -1,16 +1,33 @@
-#include "defines.h"
-#include <raylib.h>
 #include <stdio.h>
+#include <raylib.h>
+
+#include "defines.h"
+
+#include "Movement.h"
+#include "Position.h"
+#include "Rectangle.h"
 
 
 enum GameStates game_state = 0;
 
 Font pixeledted_font = (Font){};
 
+ecs_world_t* world_flecs = NULL;
+
+ecs_entity_t paddle_left = NULL;
+ecs_entity_t paddle_right = NULL;
+ecs_entity_t ball = NULL;
+
+ecs_entity_t Player = NULL;
+ecs_entity_t Player_1 = NULL;
+ecs_entity_t Player_2 = NULL;
+
 int serving_player = 0;
 
 int player_1_score = 0;
 int player_2_score = 0;
+
+int winning_player = 0;
 
 
 int game_init(void);
@@ -22,6 +39,8 @@ int game_update(void);
 
 int display_score(void);
 int top_text_pair(const char* upper_text, const char* lower_text, int text_size);
+int defining_components(void);
+
 
 
 int main(void) {
@@ -37,6 +56,9 @@ int main(void) {
 int game_init(void) {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME);
 
+    world_flecs = ecs_init();
+    defining_components();
+
     pixeledted_font = LoadFont("resources/fonts/font.ttf");
 
     // TODO: Load all the sounds in a list
@@ -44,7 +66,31 @@ int game_init(void) {
     SetTargetFPS(60);
 
     // TODO: Create both players paddles
+    paddle_left = ecs_entity(world_flecs, { .name = "Paddle_Left" });
+    ecs_set(world_flecs, paddle_left, Position, {
+        .x = 10,
+        .y = 50,
+    });
+    ecs_set(world_flecs, paddle_left, Movement, {
+        .direction = { .x=0, .y=0 },
+        .speed = 0,
+    });
+    ecs_set(world_flecs, paddle_left, Rectangle, {
+        .height = 40,
+        .width = 10,
+        .x = 0,
+        .y = 0,
+    });
+    ecs_add_id(world_flecs, paddle_left, Player);
+    ecs_add_id(world_flecs, paddle_left, Player_1);
+
+    paddle_right = ecs_entity(world_flecs, { .name = "Paddle_Right" });
+    ecs_set(world_flecs, paddle_right, Position, {
+        .x=0,
+        .y=0,
+    });
     // TODO: Create the ball
+    ball = ecs_entity(world_flecs, { .name = "Ball" });
 
     serving_player = 1;
     game_state = START_STATE;
@@ -62,8 +108,13 @@ int game_mainloop(void) {
 }
 
 int game_close(void) {
+    // Closing all the raylib stuff
     UnloadFont(pixeledted_font);
     CloseWindow();
+
+    // Closing all the flecs stuff
+    ecs_fini(world_flecs);
+    world_flecs = NULL;
 
     return 0;
 }
@@ -95,15 +146,11 @@ int game_draw(void) {
         }
 
         case GAME_OVER_STATE: {
-
-            // TODO: GAME_OVER_STATE
+            top_text_pair(TextFormat("Player %d wins!", winning_player), "", LARGE_FONT);
 
             break;
         }
-
     }
-
-
 
     display_score();
 
@@ -148,3 +195,12 @@ int top_text_pair(const char* upper_text, const  char* lower_text, int text_size
 
     return 0;
 }
+
+int defining_components(void) {
+    ECS_COMPONENT_DEFINE(world_flecs, Position);
+    ECS_COMPONENT_DEFINE(world_flecs, Movement);
+    ECS_COMPONENT_DEFINE(world_flecs, Rectangle);
+
+    return 0;
+}
+// 150

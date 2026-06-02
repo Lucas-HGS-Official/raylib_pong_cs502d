@@ -1,4 +1,8 @@
+#pragma once
+
 #include <raylib.h>
+
+#include "flecs.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 450
@@ -20,7 +24,10 @@ enum GameStates {
     GAME_OVER_STATE,
 };
 
+
 extern enum GameStates game_state;
+
+extern ecs_world_t* world_flecs;
 
 extern Font pixeledted_font;
 
@@ -29,4 +36,16 @@ extern int serving_player;
 extern int player_1_score;
 extern int player_2_score;
 
-// 26 lines
+extern int winning_player;
+
+// Entities
+extern ecs_entity_t paddle_left;
+extern ecs_entity_t paddle_right;
+extern ecs_entity_t ball;
+
+// Tags
+extern ecs_entity_t Player;
+extern ecs_entity_t Player_1;
+extern ecs_entity_t Player_2;
+
+// 30 lines
