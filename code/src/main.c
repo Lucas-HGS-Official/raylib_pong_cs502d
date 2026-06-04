@@ -1,11 +1,9 @@
-#include <stdio.h>
 #include <raylib.h>
 
 #include "defines.h"
 
-#include "Movement.h"
-#include "Position.h"
-#include "Rectangle.h"
+#include "component_manager.h"
+#include "Paddle.h"
 
 
 enum GameStates game_state = 0;
@@ -29,6 +27,8 @@ int player_2_score = 0;
 
 int winning_player = 0;
 
+ECS_COMPONENT_DECLARE(Paddle);
+
 
 int game_init(void);
 int game_mainloop(void);
@@ -39,7 +39,7 @@ int game_update(void);
 
 int display_score(void);
 int top_text_pair(const char* upper_text, const char* lower_text, int text_size);
-int defining_components(void);
+// int defining_components(void);
 
 
 
@@ -57,7 +57,8 @@ int game_init(void) {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME);
 
     world_flecs = ecs_init();
-    defining_components();
+    component_manager_init(world_flecs);
+    // init_draw_player_system();
 
     pixeledted_font = LoadFont("resources/fonts/font.ttf");
 
@@ -66,31 +67,55 @@ int game_init(void) {
     SetTargetFPS(60);
 
     // TODO: Create both players paddles
-    paddle_left = ecs_entity(world_flecs, { .name = "Paddle_Left" });
-    ecs_set(world_flecs, paddle_left, Position, {
-        .x = 10,
-        .y = 50,
-    });
-    ecs_set(world_flecs, paddle_left, Movement, {
-        .direction = { .x=0, .y=0 },
-        .speed = 0,
-    });
-    ecs_set(world_flecs, paddle_left, Rectangle, {
+    // Left Paddle
+    // paddle_left = ecs_entity(world_flecs, { .name = "Paddle_Left" });
+    // ecs_set(world_flecs, paddle_left, Position, {
+    //     .x = 10,
+    //     .y = 50,
+    // });
+    // ecs_set(world_flecs, paddle_left, Movement, {
+    //     .direction = { .x=0, .y=0 },
+    //     .speed = PADDLE_SPEED,
+    // });
+    ecs_set(world_flecs, paddle_left, Paddle, {
         .height = 40,
         .width = 10,
-        .x = 0,
-        .y = 0,
+        .x = 10,
+        .y  = 50,
     });
-    ecs_add_id(world_flecs, paddle_left, Player);
-    ecs_add_id(world_flecs, paddle_left, Player_1);
+    // ecs_add_id(world_flecs, paddle_left, Player);
+    // ecs_add_id(world_flecs, paddle_left, Player_1);
 
-    paddle_right = ecs_entity(world_flecs, { .name = "Paddle_Right" });
-    ecs_set(world_flecs, paddle_right, Position, {
-        .x=0,
-        .y=0,
-    });
+    // // Right Paddle
+    // paddle_right = ecs_entity(world_flecs, { .name = "Paddle_Right" });
+    // ecs_set(world_flecs, paddle_right, Position, {
+    //     .x=0,
+    //     .y=0,
+    // });
+    // ecs_set(world_flecs, paddle_right, Movement, {
+    //     .direction = { .x=WINDOW_WIDTH-20, .y=WINDOW_HEIGHT-50 },
+    //     .speed = PADDLE_SPEED,
+    // });
+    // ecs_set(world_flecs, paddle_right, Paddle, {
+    //     .height = 40,
+    //     .width = 10,
+    //     .x=WINDOW_WIDTH-20,
+    //     .y=WINDOW_HEIGHT-50,
+    // });
+    // ecs_add_id(world_flecs, paddle_right, Player);
+    // ecs_add_id(world_flecs, paddle_right, Player_2);
+
     // TODO: Create the ball
-    ball = ecs_entity(world_flecs, { .name = "Ball" });
+    // ball = ecs_entity(world_flecs, { .name = "Ball" });
+    // ecs_set(world_flecs, ball, Position, {
+    //     .x=WINDOW_WIDTH/2.f,
+    //     .y=WINDOW_HEIGHT/2.f,
+    // });
+    // ecs_set(world_flecs, ball, Movement, {
+    //     .direction = { .x=WINDOW_WIDTH-20, .y=WINDOW_HEIGHT-50 },
+    //     .speed = PADDLE_SPEED,
+    // });
+
 
     serving_player = 1;
     game_state = START_STATE;
@@ -153,6 +178,7 @@ int game_draw(void) {
     }
 
     display_score();
+    // ecs_progress(world_flecs, 0);
 
     EndDrawing();
 
@@ -196,11 +222,8 @@ int top_text_pair(const char* upper_text, const  char* lower_text, int text_size
     return 0;
 }
 
-int defining_components(void) {
-    ECS_COMPONENT_DEFINE(world_flecs, Position);
-    ECS_COMPONENT_DEFINE(world_flecs, Movement);
-    ECS_COMPONENT_DEFINE(world_flecs, Rectangle);
+// int defining_components(void) {
 
-    return 0;
-}
-// 150
+//     return 0;
+// }
+// 205

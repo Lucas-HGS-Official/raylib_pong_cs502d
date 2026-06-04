@@ -1,8 +1,10 @@
-#pragma once
+#ifndef DEFINES_H
+#define DEFINES_H
 
 #include <raylib.h>
 
 #include "flecs.h"
+
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 450
@@ -48,4 +50,6 @@ extern ecs_entity_t Player;
 extern ecs_entity_t Player_1;
 extern ecs_entity_t Player_2;
 
-// 30 lines
+// 49 lines
+
+#endif
