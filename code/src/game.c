@@ -38,10 +38,21 @@ static inline void _init_managers(void) {
 
 
 void game_manager_loop(void) {
-    while (!WindowShouldClose()) {
+    bool running = true;
+    bool started = false;
+    float time = 0;
+    if (!IsWindowReady())
+        return;
+    while (running) {
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
+        float delta = GetFrameTime();
+        running = ecs_progress(world_flecs, 0);
+        time += delta;
+        if (!started && time > delta) {
+            started = true;
+        }
         EndDrawing();
     }
 }

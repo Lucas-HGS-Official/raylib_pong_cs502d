@@ -38943,4 +38943,3 @@ inline flecs::scoped_world world::scope(const char* name) const {
 
 #endif
 
-
