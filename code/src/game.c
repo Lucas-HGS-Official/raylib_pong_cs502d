@@ -2,19 +2,28 @@
 
 #include "flecs.h"
 #include <raylib.h>
+#include <stdio.h>
 
 #include "define.h"
 
-#include "component_manager.h"
-#include "system_manager.h"
-#include "entity_manager.h"
+typedef struct Label {
+    char* text;
+    int size;
+} Label;
 
+ECS_COMPONENT_DECLARE(Label);
 
 static ecs_world_t *world_flecs = NULL;
+
+void component_manager_init(ecs_world_t *world);
+void system_manager_init(ecs_world_t *world);
+void entity_manager_init(ecs_world_t *world);
 
 static inline void _init_raylib(void);
 static inline void _init_flecs(void);
 static inline void _init_managers(void);
+
+void ui_text(ecs_iter_t *it);
 
 void game_manager_init(void) {
     _init_raylib();
@@ -41,14 +50,12 @@ void game_manager_loop(void) {
     bool running = true;
     bool started = false;
     float time = 0;
-    if (!IsWindowReady())
-        return;
-    while (running) {
+    while (!WindowShouldClose()) {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
         float delta = GetFrameTime();
-        running = ecs_progress(world_flecs, 0);
+        running = ecs_progress(world_flecs, delta);
         time += delta;
         if (!started && time > delta) {
             started = true;
@@ -60,4 +67,36 @@ void game_manager_loop(void) {
 void game_manager_fini(void) {
     CloseWindow();
     ecs_fini(world_flecs);
+}
+
+
+
+void component_manager_init(ecs_world_t *world) {
+    ECS_COMPONENT_DEFINE(world, Label);
+}
+void system_manager_init(ecs_world_t *world) {
+    ECS_SYSTEM(world, ui_text, EcsOnUpdate, Label);
+}
+void entity_manager_init(ecs_world_t *world) {
+    ecs_entity_t text_test = ecs_entity(world_flecs, { .name="Test" });
+    ecs_set(world_flecs, text_test, Label, {
+        .text = "Hello World!",
+        .size = 22,
+    });
+    if (ecs_is_alive(world_flecs, text_test)) { printf("\ntest\n\n"); }
+
+}
+
+void ui_text(ecs_iter_t *it) {
+    // while (ecs_iter_next(it)) {
+        Label *labels = ecs_field(it, Label, 0);
+
+        for (int i=0; i<it->count; i++) {
+            Label label = labels[i];
+            // BeginDrawing();
+            // ClearBackground(RAYWHITE);
+            DrawText(label.text, 0, 0, label.size, BLACK);
+            // EndDrawing();
+        // }
+    }
 }
