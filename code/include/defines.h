@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 
+
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
@@ -13,7 +14,6 @@
 
 #define BG_COLOR (Color) {40, 60, 60, 255}
 
-#define PADDLE_SPEED 250
 
 enum FontSizes {
     SMALL_FONT = 16,
@@ -27,6 +27,7 @@ enum GameStates {
     PLAY_STATE,
     GAME_OVER_STATE,
 };
+
 
 extern enum GameStates game_state;
 

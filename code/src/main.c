@@ -1,5 +1,11 @@
 #include <raylib.h>
+
 #include "defines.h"
+#include "paddle.h"
+
+
+paddle_t *paddle_1 = (paddle_t*) {};
+paddle_t *paddle_2 = (paddle_t*) {};
 
 
 enum GameStates game_state;
@@ -20,8 +26,13 @@ void game_close(void);
 
 void draw_start_screen(void);
 void draw_serve_screen(void);
-// void draw_play_screen(void);
+void draw_play_screen(void);
 void draw_game_over_screen(void);
+
+void update_start_state(void);
+void update_serve_state(void);
+void update_play_state(void);
+void update_game_over_state(void);
 
 void top_text_pair(const char *upper_text, const  char *lower_text, int text_size);
 void display_score(void);
@@ -48,6 +59,9 @@ void game_init(void) {
     player_1_score = 0;
     player_2_score = 0;
 
+    paddle_1 = create_paddle(paddle_1, (Vector2) { .x=PADDLE_WIDTH, .y=20 });
+    paddle_2 = create_paddle(paddle_2, (Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
+
     serving_player = 1;
 
     game_state = START_STATE;
@@ -58,18 +72,22 @@ void game_loop(void) {
     while (!WindowShouldClose()) {
         switch (game_state) {
             case START_STATE:
+                update_start_state();
                 draw_start_screen();
             break;
 
             case SERVE_STATE:
+                update_serve_state();
                 draw_serve_screen();
             break;
 
             case PLAY_STATE:
-                // draw_play_screen();
+                update_play_state();
+                draw_play_screen();
             break;
 
             case GAME_OVER_STATE:
+                update_game_over_state();
                 draw_game_over_screen();
             break;
         }
@@ -80,6 +98,9 @@ void game_loop(void) {
 void game_close(void) {
     UnloadFont(pixeledted_font);
     pixeledted_font = (Font) {};
+
+    destroy_paddle(paddle_1);
+    destroy_paddle(paddle_2);
 
     CloseWindow();
 
@@ -94,6 +115,9 @@ void draw_start_screen(void) {
     top_text_pair("Welcome to Pong!", "Press Enter to begin!", SMALL_FONT);
     display_score();
 
+    draw_paddle(paddle_1);
+    draw_paddle(paddle_2);
+
     EndDrawing();
 
     return;
@@ -105,11 +129,27 @@ void draw_serve_screen(void) {
     top_text_pair(TextFormat("Player %d's serve", serving_player), "Press Enter to serve!", SMALL_FONT);
     display_score();
 
+    draw_paddle(paddle_1);
+    draw_paddle(paddle_2);
+
     EndDrawing();
 
     return;
 }
-// void draw_play_screen(void);
+void draw_play_screen(void){
+    BeginDrawing();
+    ClearBackground(BG_COLOR);
+
+    draw_centralized_text("Playing!!", 10, LARGE_FONT);
+    display_score();
+
+    draw_paddle(paddle_1);
+    draw_paddle(paddle_2);
+
+    EndDrawing();
+
+    return;
+}
 void draw_game_over_screen(void) {
     BeginDrawing();
     ClearBackground(BG_COLOR);
@@ -117,11 +157,34 @@ void draw_game_over_screen(void) {
     draw_centralized_text(TextFormat("Player %d wins!", winning_player), 10, LARGE_FONT);
     display_score();
 
+    draw_paddle(paddle_1);
+    draw_paddle(paddle_2);
+
     EndDrawing();
 
     return;
 }
 
+void update_start_state(void) {
+    if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
+
+    return;
+}
+void update_serve_state(void) {
+    if (IsKeyPressed(KEY_ENTER)) game_state = PLAY_STATE;
+
+    return;
+}
+void update_play_state(void) {
+    if (IsKeyPressed(KEY_ENTER)) game_state = GAME_OVER_STATE;
+
+    return;
+}
+void update_game_over_state(void) {
+    if (IsKeyPressed(KEY_ENTER)) game_state = START_STATE;
+
+    return;
+}
 
 void top_text_pair(const char *upper_text, const  char *lower_text, int text_size) {
     const int text_padding_up = 10;
