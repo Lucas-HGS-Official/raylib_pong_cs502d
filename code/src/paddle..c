@@ -12,7 +12,7 @@ typedef struct paddle_t {
 } paddle_t;
 
 
-paddle_t *create_paddle(paddle_t *paddle, Vector2 initial_pos) {
+paddle_t *paddle_init(paddle_t *paddle, Vector2 initial_pos) {
     paddle = (paddle_t*) MemAlloc(sizeof(paddle_t));
     paddle->rec = (Rectangle) {
         .height = PADDLE_HEIGHT,
@@ -29,13 +29,13 @@ paddle_t *create_paddle(paddle_t *paddle, Vector2 initial_pos) {
     return paddle;
 }
 
-void draw_paddle(paddle_t *paddle) {
+void paddle_render(paddle_t *paddle) {
     DrawRectangleRec(paddle->rec, RAYWHITE);
 
     return;
 }
 
-void destroy_paddle(paddle_t *paddle) {
+void paddle_delete(paddle_t *paddle) {
     MemFree(paddle);
 
     paddle = NULL;

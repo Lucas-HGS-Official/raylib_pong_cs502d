@@ -57,8 +57,8 @@ void game_init(void) {
     player_1_score = 0;
     player_2_score = 0;
 
-    paddle_1 = create_paddle(paddle_1, (Vector2) { .x=PADDLE_WIDTH, .y=20 });
-    paddle_2 = create_paddle(paddle_2, (Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
+    paddle_1 = paddle_init(paddle_1, (Vector2) { .x=PADDLE_WIDTH, .y=20 });
+    paddle_2 = paddle_init(paddle_2, (Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
 
     serving_player = 1;
 
@@ -78,8 +78,8 @@ void game_close(void) {
     UnloadFont(pixeledted_font);
     pixeledted_font = (Font) {};
 
-    destroy_paddle(paddle_1);
-    destroy_paddle(paddle_2);
+    paddle_delete(paddle_1);
+    paddle_delete(paddle_2);
 
     CloseWindow();
 
@@ -131,8 +131,8 @@ void draw_game(void) {
     }
     display_score();
 
-    draw_paddle(paddle_1);
-    draw_paddle(paddle_2);
+    paddle_render(paddle_1);
+    paddle_render(paddle_2);
 
     EndDrawing();
 
