@@ -24,10 +24,8 @@ void game_init(void);
 void game_loop(void);
 void game_close(void);
 
-void draw_start_screen(void);
-void draw_serve_screen(void);
-void draw_play_screen(void);
-void draw_game_over_screen(void);
+void update_game(void);
+void draw_game(void);
 
 void update_start_state(void);
 void update_serve_state(void);
@@ -70,27 +68,8 @@ void game_init(void) {
 }
 void game_loop(void) {
     while (!WindowShouldClose()) {
-        switch (game_state) {
-            case START_STATE:
-                update_start_state();
-                draw_start_screen();
-            break;
-
-            case SERVE_STATE:
-                update_serve_state();
-                draw_serve_screen();
-            break;
-
-            case PLAY_STATE:
-                update_play_state();
-                draw_play_screen();
-            break;
-
-            case GAME_OVER_STATE:
-                update_game_over_state();
-                draw_game_over_screen();
-            break;
-        }
+        update_game();
+        draw_game();
     }
 
     return;
@@ -108,11 +87,48 @@ void game_close(void) {
 }
 
 
-void draw_start_screen(void) {
+void update_game(void) {
+    switch (game_state) {
+        case START_STATE:
+            update_start_state();
+        break;
+
+        case SERVE_STATE:
+            update_serve_state();
+        break;
+
+        case PLAY_STATE:
+            update_play_state();
+        break;
+
+        case GAME_OVER_STATE:
+            update_game_over_state();
+        break;
+    }
+
+    return;
+}
+void draw_game(void) {
     BeginDrawing();
     ClearBackground(BG_COLOR);
 
-    top_text_pair("Welcome to Pong!", "Press Enter to begin!", SMALL_FONT);
+    switch (game_state) {
+        case START_STATE:
+            top_text_pair("Welcome to Pong!", "Press Enter to begin!", SMALL_FONT);
+        break;
+
+        case SERVE_STATE:
+            top_text_pair(TextFormat("Player %d's serve", serving_player), "Press Enter to serve!", SMALL_FONT);
+        break;
+
+        case PLAY_STATE:
+            draw_centralized_text("Playing!!", 10, LARGE_FONT);
+        break;
+
+        case GAME_OVER_STATE:
+            draw_centralized_text(TextFormat("Player %d wins!", winning_player), 10, LARGE_FONT);
+        break;
+    }
     display_score();
 
     draw_paddle(paddle_1);
@@ -122,48 +138,7 @@ void draw_start_screen(void) {
 
     return;
 }
-void draw_serve_screen(void) {
-    BeginDrawing();
-    ClearBackground(BG_COLOR);
 
-    top_text_pair(TextFormat("Player %d's serve", serving_player), "Press Enter to serve!", SMALL_FONT);
-    display_score();
-
-    draw_paddle(paddle_1);
-    draw_paddle(paddle_2);
-
-    EndDrawing();
-
-    return;
-}
-void draw_play_screen(void){
-    BeginDrawing();
-    ClearBackground(BG_COLOR);
-
-    draw_centralized_text("Playing!!", 10, LARGE_FONT);
-    display_score();
-
-    draw_paddle(paddle_1);
-    draw_paddle(paddle_2);
-
-    EndDrawing();
-
-    return;
-}
-void draw_game_over_screen(void) {
-    BeginDrawing();
-    ClearBackground(BG_COLOR);
-
-    draw_centralized_text(TextFormat("Player %d wins!", winning_player), 10, LARGE_FONT);
-    display_score();
-
-    draw_paddle(paddle_1);
-    draw_paddle(paddle_2);
-
-    EndDrawing();
-
-    return;
-}
 
 void update_start_state(void) {
     if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
