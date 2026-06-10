@@ -57,8 +57,8 @@ void game_init(void) {
     player_1_score = 0;
     player_2_score = 0;
 
-    paddle_1 = paddle_init(paddle_1, (Vector2) { .x=PADDLE_WIDTH, .y=20 });
-    paddle_2 = paddle_init(paddle_2, (Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
+    paddle_1 = paddle_init((Vector2) { .x=PADDLE_WIDTH, .y=20 });
+    paddle_2 = paddle_init((Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
 
     serving_player = 1;
 

@@ -12,7 +12,7 @@
 typedef struct paddle_t paddle_t;
 
 
-paddle_t *paddle_init(paddle_t *paddle, Vector2 initial_pos);
+paddle_t *paddle_init(Vector2 initial_pos);
 void paddle_render(paddle_t *paddle);
 void paddle_delete(paddle_t *paddle);
 

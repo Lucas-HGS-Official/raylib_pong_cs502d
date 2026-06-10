@@ -12,8 +12,8 @@ typedef struct paddle_t {
 } paddle_t;
 
 
-paddle_t *paddle_init(paddle_t *paddle, Vector2 initial_pos) {
-    paddle = (paddle_t*) MemAlloc(sizeof(paddle_t));
+paddle_t *paddle_init(Vector2 initial_pos) {
+    paddle_t *paddle = (paddle_t*) MemAlloc(sizeof(paddle_t));
     paddle->rec = (Rectangle) {
         .height = PADDLE_HEIGHT,
         .width = PADDLE_WIDTH,
