@@ -27,11 +27,6 @@ void game_close(void);
 void update_game(void);
 void draw_game(void);
 
-void update_start_state(void);
-void update_serve_state(void);
-void update_play_state(void);
-void update_game_over_state(void);
-
 void top_text_pair(const char *upper_text, const  char *lower_text, int text_size);
 void display_score(void);
 Vector2 draw_centralized_text(const char *text, int y_pos, int text_size);
@@ -52,13 +47,20 @@ void game_init(void) {
 
     pixeledted_font = LoadFont("resources/fonts/font.ttf");
 
-    //TODO: do audio stuff
+
+    // sounds = {
+    //     ["paddle_hit"] = love.audio.newSource("sounds/paddle_hit.wav", "static"),
+    //     ["score"] = love.audio.newSource("sounds/score.wav", "static"),
+    //     ["wall_hit"] = love.audio.newSource("sounds/wall_hit.wav", "static")
+    // }
 
     player_1_score = 0;
     player_2_score = 0;
 
     paddle_1 = paddle_init((Vector2) { .x=PADDLE_WIDTH, .y=20 });
     paddle_2 = paddle_init((Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
+
+    // ball = Ball(VIRTUAL_WIDTH / 2 - 4, VIRTUAL_HEIGHT / 2 - 4, 8, 8)
 
     serving_player = 1;
 
@@ -90,21 +92,110 @@ void game_close(void) {
 void update_game(void) {
     switch (game_state) {
         case START_STATE:
-            update_start_state();
+            if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
         break;
 
         case SERVE_STATE:
-            update_serve_state();
+            if (IsKeyPressed(KEY_ENTER)) game_state = PLAY_STATE;
+
+            // ball.dy = math.random(-50, 50)
+            // if serving_player == 1 then
+            //     ball.dx = math.random(140, 200)
+            // else
+            //     ball.dx = -math.random(140, 200)
+            // end
         break;
 
         case PLAY_STATE:
-            update_play_state();
+            // if ball:collides(player_1) then
+            //     ball.dx = -ball.dx * 1.03
+            //     ball.x = player_1.x + 10
+
+            //     if ball.dy < 0 then
+            //         ball.dy = -math.random(10, 150)
+            //     else
+            //         ball.dy = math.random(10, 150)
+            //     end
+
+            //     sounds["paddle_hit"]:play()
+            // end
+            // if ball:collides(player_2) then
+            //     ball.dx = -ball.dx * 1.03
+            //     ball.x = player_2.x - 8
+
+            //     if ball.dy < 0 then
+            //         ball.dy = -math.random(10, 150)
+            //     else
+            //         ball.dy = math.random(10, 150)
+            //     end
+
+            //     sounds["paddle_hit"]:play()
+            // end
+
+            // if ball.y <= 0 then
+            //     ball.y = 0
+            //     ball.dy = -ball.dy
+            //     sounds["wall_hit"]:play()
+            // end
+            // if ball.y >= VIRTUAL_HEIGHT - 8 then
+            //     ball.y = VIRTUAL_HEIGHT - 8
+            //     ball.dy = -ball.dy
+            //     sounds["wall_hit"]:play()
+            // end
+
+            // if ball.x < -8 then
+            //     serving_player = 1
+            //     player_2_score = player_2_score + 1
+            //     sounds["score"]:play()
+            //     if player_2_score == 2 then
+            //         winning_player = 2
+            //         game_state = "done"
+            //     else
+            //         game_state = "serve"
+            //         ball:reset()
+            //     end
+            // end
+
+            // if ball.x > VIRTUAL_WIDTH then
+            //     serving_player = 2
+            //     player_1_score = player_1_score + 1
+            //     sounds["score"]:play()
+            //     if player_1_score == 2 then
+            //         winning_player = 1
+            //         game_state = "done"
+            //     else
+            //         game_state = "serve"
+            //         ball:reset()
+            //     end
+            // end
         break;
 
         case GAME_OVER_STATE:
-            update_game_over_state();
+            if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
+            // ball:reset()
+            player_1_score = 0;
+            player_2_score = 0;
+            if (winning_player == 1) serving_player = 2;
+            else serving_player = 1;
         break;
     }
+
+    // if (IsKeyDown(KEY_W)) paddle_1->dY = -PADDLE_SPEED;
+    // if (IsKeyDown(KEY_S)) paddle_1->dY = +PADDLE_SPEED;
+    // else paddle_1->dY = 0;
+    paddle_1->dY = (-PADDLE_SPEED * (float)IsKeyDown(KEY_W)) + (+PADDLE_SPEED * (float)IsKeyDown(KEY_S));
+
+    // if (IsKeyDown(KEY_UP)) paddle_2->dY = -PADDLE_SPEED;
+    // if (IsKeyDown(KEY_DOWN)) paddle_2->dY = +PADDLE_SPEED;
+    // else paddle_2->dY = 0;
+    paddle_2->dY = (-PADDLE_SPEED * (float)IsKeyDown(KEY_UP)) + (+PADDLE_SPEED * (float)IsKeyDown(KEY_DOWN));
+
+
+    // if game_state == "play" then
+    //     ball:update(dt)
+    // end
+    paddle_update(paddle_1);
+    paddle_update(paddle_2);
 
     return;
 }
@@ -139,27 +230,6 @@ void draw_game(void) {
     return;
 }
 
-
-void update_start_state(void) {
-    if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
-
-    return;
-}
-void update_serve_state(void) {
-    if (IsKeyPressed(KEY_ENTER)) game_state = PLAY_STATE;
-
-    return;
-}
-void update_play_state(void) {
-    if (IsKeyPressed(KEY_ENTER)) game_state = GAME_OVER_STATE;
-
-    return;
-}
-void update_game_over_state(void) {
-    if (IsKeyPressed(KEY_ENTER)) game_state = START_STATE;
-
-    return;
-}
 
 void top_text_pair(const char *upper_text, const  char *lower_text, int text_size) {
     const int text_padding_up = 10;
