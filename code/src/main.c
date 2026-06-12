@@ -176,12 +176,14 @@ void update_game(void) {
         break;
 
         case GAME_OVER_STATE:
-            if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
-            ball_reset(ball);
-            player_1_score = 0;
-            player_2_score = 0;
-            if (winning_player == 1) serving_player = 2;
-            else serving_player = 1;
+            if (IsKeyPressed(KEY_ENTER)) {
+                game_state = SERVE_STATE;
+                ball_reset(ball);
+                player_1_score = 0;
+                player_2_score = 0;
+                if (winning_player == 1) serving_player = 2;
+                else serving_player = 1;
+            }
         break;
     }
 
