@@ -2,10 +2,12 @@
 
 #include "defines.h"
 #include "paddle.h"
+#include "ball.h"
 
 
 paddle_t *paddle_1 = (paddle_t*) {};
 paddle_t *paddle_2 = (paddle_t*) {};
+ball_t *ball = (ball_t*) {};
 
 
 enum GameStates game_state;
@@ -47,7 +49,6 @@ void game_init(void) {
 
     pixeledted_font = LoadFont("resources/fonts/font.ttf");
 
-
     // sounds = {
     //     ["paddle_hit"] = love.audio.newSource("sounds/paddle_hit.wav", "static"),
     //     ["score"] = love.audio.newSource("sounds/score.wav", "static"),
@@ -60,7 +61,7 @@ void game_init(void) {
     paddle_1 = paddle_init((Vector2) { .x=PADDLE_WIDTH, .y=20 });
     paddle_2 = paddle_init((Vector2) { .x=GAME_WIDTH -(PADDLE_WIDTH*2), .y=GAME_HEIGHT - (PADDLE_HEIGHT+20) });
 
-    // ball = Ball(VIRTUAL_WIDTH / 2 - 4, VIRTUAL_HEIGHT / 2 - 4, 8, 8)
+    ball = ball_init();
 
     serving_player = 1;
 
@@ -83,6 +84,8 @@ void game_close(void) {
     paddle_delete(paddle_1);
     paddle_delete(paddle_2);
 
+    ball_delete(ball);
+
     CloseWindow();
 
     return;
@@ -98,81 +101,83 @@ void update_game(void) {
         case SERVE_STATE:
             if (IsKeyPressed(KEY_ENTER)) game_state = PLAY_STATE;
 
-            // ball.dy = math.random(-50, 50)
-            // if serving_player == 1 then
-            //     ball.dx = math.random(140, 200)
-            // else
-            //     ball.dx = -math.random(140, 200)
-            // end
+            ball->Dxy.y = GetRandomValue(-50, 50);
+            int rand_serv_x = GetRandomValue(140, 200);
+            if (serving_player == 1) ball->Dxy.x = rand_serv_x;
+            if (serving_player == 2) ball->Dxy.x = -rand_serv_x;
         break;
 
         case PLAY_STATE:
-            // if ball:collides(player_1) then
-            //     ball.dx = -ball.dx * 1.03
-            //     ball.x = player_1.x + 10
+            if (CheckCollisionRecs(ball->rec, paddle_1->rec)) {
+                ball->Dxy.x = -ball->Dxy.x * 1.03;
+                ball->rec.x = paddle_1->rec.x + BALL_WIDTH;
 
-            //     if ball.dy < 0 then
-            //         ball.dy = -math.random(10, 150)
-            //     else
-            //         ball.dy = math.random(10, 150)
-            //     end
+                int rand_ball_y = GetRandomValue(10, 150);
+                if (ball->Dxy.y < 0) {
+                    ball->Dxy.y = -rand_ball_y;
+                } else {
+                    ball->Dxy.y = rand_ball_y;
+                }
 
-            //     sounds["paddle_hit"]:play()
-            // end
-            // if ball:collides(player_2) then
-            //     ball.dx = -ball.dx * 1.03
-            //     ball.x = player_2.x - 8
+                // sounds["paddle_hit"]:play()
+            }
 
-            //     if ball.dy < 0 then
-            //         ball.dy = -math.random(10, 150)
-            //     else
-            //         ball.dy = math.random(10, 150)
-            //     end
+            if (CheckCollisionRecs(ball->rec, paddle_2->rec)) {
+                ball->Dxy.x = -ball->Dxy.x * 1.03;
+                ball->rec.x = paddle_2->rec.x - BALL_WIDTH;
 
-            //     sounds["paddle_hit"]:play()
-            // end
+                int rand_ball_y = GetRandomValue(10, 150);
+                if (ball->Dxy.y < 0) {
+                    ball->Dxy.y = -rand_ball_y;
+                } else {
+                    ball->Dxy.y = rand_ball_y;
+                }
 
-            // if ball.y <= 0 then
-            //     ball.y = 0
-            //     ball.dy = -ball.dy
-            //     sounds["wall_hit"]:play()
-            // end
-            // if ball.y >= VIRTUAL_HEIGHT - 8 then
-            //     ball.y = VIRTUAL_HEIGHT - 8
-            //     ball.dy = -ball.dy
-            //     sounds["wall_hit"]:play()
-            // end
+                // sounds["paddle_hit"]:play()
+            }
 
-            // if ball.x < -8 then
-            //     serving_player = 1
-            //     player_2_score = player_2_score + 1
-            //     sounds["score"]:play()
-            //     if player_2_score == 2 then
-            //         winning_player = 2
-            //         game_state = "done"
-            //     else
-            //         game_state = "serve"
-            //         ball:reset()
-            //     end
-            // end
+            if (ball->rec.y <= 0) {
+                ball->rec.y = 0;
+                ball->Dxy.y = -ball->Dxy.y;
+                // sounds["wall_hit"]:play()
+            }
 
-            // if ball.x > VIRTUAL_WIDTH then
-            //     serving_player = 2
-            //     player_1_score = player_1_score + 1
-            //     sounds["score"]:play()
-            //     if player_1_score == 2 then
-            //         winning_player = 1
-            //         game_state = "done"
-            //     else
-            //         game_state = "serve"
-            //         ball:reset()
-            //     end
-            // end
+            if (ball->rec.y >= GAME_HEIGHT - BALL_HEIGHT) {
+                ball->rec.y = GAME_HEIGHT - BALL_HEIGHT;
+                ball->Dxy.y = -ball->Dxy.y;
+                // sounds["wall_hit"]:play()
+            }
+
+            if (ball->rec.x < -BALL_WIDTH) {
+                serving_player = 1;
+                player_2_score++;
+                // sounds["score"]:play()
+                if (player_2_score == 2) {
+                    winning_player = 2;
+                    game_state = GAME_OVER_STATE;
+                } else {
+                    game_state = SERVE_STATE;
+                    ball_reset(ball);
+                }
+            }
+
+            if (ball->rec.x > GAME_WIDTH) {
+                serving_player = 2;
+                player_1_score++;
+                // sounds["score"]:play()
+                if (player_1_score == 2) {
+                    winning_player = 1;
+                    game_state = GAME_OVER_STATE;
+                } else {
+                    game_state = SERVE_STATE;
+                    ball_reset(ball);
+                }
+            }
         break;
 
         case GAME_OVER_STATE:
             if (IsKeyPressed(KEY_ENTER)) game_state = SERVE_STATE;
-            // ball:reset()
+            ball_reset(ball);
             player_1_score = 0;
             player_2_score = 0;
             if (winning_player == 1) serving_player = 2;
@@ -190,10 +195,8 @@ void update_game(void) {
     // else paddle_2->dY = 0;
     paddle_2->dY = (-PADDLE_SPEED * (float)IsKeyDown(KEY_UP)) + (+PADDLE_SPEED * (float)IsKeyDown(KEY_DOWN));
 
+    if (game_state == PLAY_STATE) ball_update(ball);
 
-    // if game_state == "play" then
-    //     ball:update(dt)
-    // end
     paddle_update(paddle_1);
     paddle_update(paddle_2);
 
@@ -213,7 +216,7 @@ void draw_game(void) {
         break;
 
         case PLAY_STATE:
-            draw_centralized_text("Playing!!", 10, LARGE_FONT);
+            // draw_centralized_text("Playing!!", 10, LARGE_FONT);
         break;
 
         case GAME_OVER_STATE:
@@ -222,8 +225,12 @@ void draw_game(void) {
     }
     display_score();
 
+    // DrawLine(GAME_WIDTH/2.f, 0, GAME_WIDTH/2.f, GAME_HEIGHT, RAYWHITE);
+
     paddle_render(paddle_1);
     paddle_render(paddle_2);
+
+    ball_render(ball);
 
     EndDrawing();
 
