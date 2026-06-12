@@ -1,4 +1,8 @@
 ray_pong_clone
+*.data
+*.html
+*.js
+*.wasm
 
 bin/game
 code/obj/*.o

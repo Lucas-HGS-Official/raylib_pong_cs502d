@@ -10,7 +10,7 @@
 #define GAME_WIDTH 854
 #define GAME_HEIGHT 480
 
-#define GAME_NAME "Raylib CS50 2D Pong."
+#define GAME_NAME "Raylib CS50 2D Pong"
 
 #define BG_COLOR (Color) {40, 60, 60, 255}
 
