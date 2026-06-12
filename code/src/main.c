@@ -5,21 +5,43 @@
 #include "ball.h"
 
 
-paddle_t *paddle_1 = (paddle_t*) {};
-paddle_t *paddle_2 = (paddle_t*) {};
-ball_t *ball = (ball_t*) {};
+enum FontSizes {
+    SMALL_FONT = 16,
+    LARGE_FONT = 32,
+    SCORE_FONT = 64,
+};
+
+enum GameStates {
+    START_STATE,
+    SERVE_STATE,
+    PLAY_STATE,
+    GAME_OVER_STATE,
+};
+
+enum Sounds {
+    PADDLE_HIT_SFX,
+    SCORE_SFX,
+    WALL_HIT_SFX,
+
+    NUM_SOUNDS,
+};
 
 
-enum GameStates game_state;
+static enum GameStates game_state;
 
-Font pixeledted_font = (Font) {};
+static Sound sounds_lists[NUM_SOUNDS] = {0};
+static paddle_t *paddle_1 = (paddle_t*) {};
+static paddle_t *paddle_2 = (paddle_t*) {};
+static ball_t *ball = (ball_t*) {};
 
-int serving_player = 0;
+static Font pixeledted_font = (Font) {};
 
-int player_1_score = 0;
-int player_2_score = 0;
+static int serving_player = 0;
 
-int winning_player = 0;
+static int player_1_score = 0;
+static int player_2_score = 0;
+
+static int winning_player = 0;
 
 
 void game_init(void);
@@ -45,15 +67,14 @@ int main(void) {
 
 void game_init(void) {
     InitWindow(GAME_WIDTH, GAME_HEIGHT, GAME_NAME);
+    InitAudioDevice();
     SetTargetFPS(60);
 
     pixeledted_font = LoadFont("resources/fonts/font.ttf");
 
-    // sounds = {
-    //     ["paddle_hit"] = love.audio.newSource("sounds/paddle_hit.wav", "static"),
-    //     ["score"] = love.audio.newSource("sounds/score.wav", "static"),
-    //     ["wall_hit"] = love.audio.newSource("sounds/wall_hit.wav", "static")
-    // }
+    sounds_lists[PADDLE_HIT_SFX] = LoadSound("resources/sounds/paddle_hit.wav");
+    sounds_lists[SCORE_SFX] = LoadSound("resources/sounds/score.wav");
+    sounds_lists[WALL_HIT_SFX] = LoadSound("resources/sounds/wall_hit.wav");
 
     player_1_score = 0;
     player_2_score = 0;
@@ -86,6 +107,12 @@ void game_close(void) {
 
     ball_delete(ball);
 
+
+    for (int i=0; i<NUM_SOUNDS; i++) {
+        UnloadSound(sounds_lists[i]);
+    }
+
+    CloseAudioDevice();
     CloseWindow();
 
     return;
@@ -118,8 +145,7 @@ void update_game(void) {
                 } else {
                     ball->Dxy.y = rand_ball_y;
                 }
-
-                // sounds["paddle_hit"]:play()
+                PlaySound(sounds_lists[PADDLE_HIT_SFX]);
             }
 
             if (CheckCollisionRecs(ball->rec, paddle_2->rec)) {
@@ -132,26 +158,25 @@ void update_game(void) {
                 } else {
                     ball->Dxy.y = rand_ball_y;
                 }
-
-                // sounds["paddle_hit"]:play()
+                PlaySound(sounds_lists[PADDLE_HIT_SFX]);
             }
 
             if (ball->rec.y <= 0) {
                 ball->rec.y = 0;
                 ball->Dxy.y = -ball->Dxy.y;
-                // sounds["wall_hit"]:play()
+                PlaySound(sounds_lists[WALL_HIT_SFX]);
             }
 
             if (ball->rec.y >= GAME_HEIGHT - BALL_HEIGHT) {
                 ball->rec.y = GAME_HEIGHT - BALL_HEIGHT;
                 ball->Dxy.y = -ball->Dxy.y;
-                // sounds["wall_hit"]:play()
+                PlaySound(sounds_lists[WALL_HIT_SFX]);
             }
 
             if (ball->rec.x < -BALL_WIDTH) {
                 serving_player = 1;
                 player_2_score++;
-                // sounds["score"]:play()
+                PlaySound(sounds_lists[SCORE_SFX]);
                 if (player_2_score == 2) {
                     winning_player = 2;
                     game_state = GAME_OVER_STATE;
@@ -164,7 +189,7 @@ void update_game(void) {
             if (ball->rec.x > GAME_WIDTH) {
                 serving_player = 2;
                 player_1_score++;
-                // sounds["score"]:play()
+                PlaySound(sounds_lists[SCORE_SFX]);
                 if (player_1_score == 2) {
                     winning_player = 1;
                     game_state = GAME_OVER_STATE;
