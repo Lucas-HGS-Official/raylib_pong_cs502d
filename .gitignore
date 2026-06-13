@@ -3,6 +3,7 @@ ray_pong_clone
 *.html
 *.js
 *.wasm
+*.zip
 
 bin/game
 code/obj/*.o
